@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "86996176313",
+    "firebase_url": "https://bookapp-55cdf-default-rtdb.firebaseio.com",
+    "project_id": "bookapp-55cdf",
+    "storage_bucket": "bookapp-55cdf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:86996176313:android:b3bdf3ee9797098dfb3a68",
+        "android_client_info": {
+          "package_name": "com.example.admin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANw6ZxY-wSedTLam52SwaVt5T4ETTyXPg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:86996176313:android:41f1b8c6ce4fe813fb3a68",
+        "android_client_info": {
+          "package_name": "com.example.heybooks"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANw6ZxY-wSedTLam52SwaVt5T4ETTyXPg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
