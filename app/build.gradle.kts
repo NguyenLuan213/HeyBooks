@@ -96,5 +96,12 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     implementation("com.google.accompanist:accompanist-flowlayout:0.14.0")
 
+    //icon
+    implementation ("androidx.compose.material:material-icons-extended:1.4.0")
+
+    implementation ("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+
+
+
 
 }

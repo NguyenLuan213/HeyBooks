@@ -1,10 +1,6 @@
 package com.example.heybooks.view
 
 import android.annotation.SuppressLint
-import com.example.heybooks.viewmodel.MainViewModel
-
-
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
@@ -16,41 +12,39 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.books.model.BookItem
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.books.model.BookItems
 import com.example.heybooks.R
 import com.example.heybooks.components.ItemBookList
-import com.example.heybooks.components.OptionMenu
+import com.example.heybooks.components.LoadingScreen
 import com.example.heybooks.components.TextInputField
 import com.example.heybooks.navigation.MainActions
 import com.example.heybooks.utils.ViewState
-import com.example.heybooks.utils.coloredShadow
-
+import com.example.heybooks.viewmodel.MainViewModel
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @ExperimentalComposeUiApi
 @Composable
-fun BookListScreen(viewModel: MainViewModel, actions: MainActions) {
+fun BookListScreen(viewModel: MainViewModel = hiltViewModel(), actions: MainActions) {
+    LaunchedEffect(Unit) {
+        viewModel.getAllBooks()
+    }
 
     when (val result = viewModel.books.value) {
-        ViewState.Loading -> Text(text = "Loading")
-        is ViewState.Error -> Text(text = "Error found: ${result.exception}")
+         ViewState.Loading -> LoadingScreen()
+        is ViewState.Error -> Text(text = "Error found: ${result.exception.message}")
         is ViewState.Success -> {
-            BookList(result.data, actions)
+            BookList(result.data, viewModel, actions)
         }
-
         ViewState.Empty -> Text("No results found!")
     }
 }
@@ -58,44 +52,29 @@ fun BookListScreen(viewModel: MainViewModel, actions: MainActions) {
 @OptIn(ExperimentalFoundationApi::class)
 @ExperimentalComposeUiApi
 @Composable
-fun BookList(bookList: List<BookItem>, actions: MainActions) {
-
-    val search = remember {
-        mutableStateOf("")
-    }
-
+fun BookList(bookList: List<BookItems>, viewModel: MainViewModel, actions: MainActions) {
+    val search = remember { mutableStateOf("") }
     val listState = rememberLazyListState()
 
     val filteredBooks = bookList.filter { it.title.contains(search.value, ignoreCase = true) }
 
-    LazyColumn(state = listState, modifier = Modifier.background(MaterialTheme.colors.background)) {
-
+    LazyColumn(
+        state = listState,
+        modifier = Modifier.background(MaterialTheme.colors.background).padding(bottom = 80.dp)
+    ) {
         stickyHeader {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(androidx.compose.material3.MaterialTheme.colorScheme.onSurface)
+                    .background(MaterialTheme.colors.onPrimary)
                     .padding(10.dp)
-            )
-            {
+            ) {
                 TextInputField(
                     label = stringResource(R.string.text_search),
                     value = search.value,
-                    onValueChanged = {
-                        search.value = it
-                    }
+                    onValueChanged = { search.value = it }
                 )
             }
-        }
-
-        item {
-            Text(
-                text = "Famous books",
-                style = MaterialTheme.typography.subtitle1,
-                color = MaterialTheme.colors.onPrimary,
-                textAlign = TextAlign.Start,
-                modifier = Modifier.padding(start = 16.dp, end = 24.dp, top = 8.dp)
-            )
         }
 
         if (filteredBooks.isEmpty()) {
@@ -103,7 +82,6 @@ fun BookList(bookList: List<BookItem>, actions: MainActions) {
                 Text(
                     text = "No result",
                     style = MaterialTheme.typography.subtitle1,
-//                    color = MaterialTheme.colors.onPrimary,
                     color = Color.Black,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
@@ -113,19 +91,20 @@ fun BookList(bookList: List<BookItem>, actions: MainActions) {
             }
         } else {
             items(filteredBooks) { book ->
-                Log.d("books", "books are ${book.title}")
-
                 ItemBookList(
-                    title = book.title,
-                    author = book.authors.toString(),
-                    thumbnailUrl = book.thumbnailUrl,
-                    categories = book.categories,
+                    book = book,
+                    isBookmarked = false, // Set initial state based on your logic
                     onItemClick = {
                         actions.gotoBookDetails.invoke(book.isbn)
+                    },
+                    onSaveClick = {
+                        viewModel.saveBookForUser(book)
+                    },
+                    onRemoveClick = {
+                        viewModel.removeBookForUser(book)
                     }
                 )
             }
         }
     }
 }
-

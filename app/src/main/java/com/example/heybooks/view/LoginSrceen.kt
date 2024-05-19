@@ -1,5 +1,6 @@
 package com.example.heybooks.view
 
+import android.annotation.SuppressLint
 import androidx.compose.material3.Text
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -39,10 +40,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.heybooks.R
 import com.example.heybooks.components.ClickTextSignUp
+import com.example.heybooks.components.LoadingScreen
 import com.example.heybooks.navigation.MainActions
 import com.example.heybooks.utils.CheckSignedIn
+import com.example.heybooks.utils.LoginViewState
+import com.example.heybooks.utils.ViewState
 import com.example.heybooks.viewmodel.MainViewModel
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun LoginScreen(viewModel: MainViewModel, actions: MainActions) {
     CheckSignedIn(viewModel = viewModel, actions)
@@ -140,7 +145,7 @@ fun LoginScreen(viewModel: MainViewModel, actions: MainActions) {
             Spacer(modifier = Modifier.height(80.dp))
             Button(
                 onClick = {
-                    viewModel.loginIn(emailState.value.text, passwordState.value.text, context)
+                    viewModel.loginIn(emailState.value.text, passwordState.value.text, context,actions)
                 },
                 modifier = Modifier
                     .fillMaxWidth()

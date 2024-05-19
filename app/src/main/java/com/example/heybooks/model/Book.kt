@@ -1,3 +1,3 @@
 package com.example.books.model
 
-class Book : ArrayList<BookItem>()
+//class Book : ArrayList<BookItem>()

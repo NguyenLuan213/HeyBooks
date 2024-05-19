@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
@@ -60,8 +62,8 @@ fun BottomNavigationContent(viewModel: MainViewModel, actions: MainActions, sele
         ),
         BottomNavigationItem(
             title = "Chat",
-            selectedIcon = Icons.Filled.Favorite,
-            unselectedIcon = Icons.Outlined.Favorite,
+            selectedIcon = Icons.Filled.Bookmark,
+            unselectedIcon = Icons.Filled.BookmarkBorder,
             goto = { actions.gotoSavedBook() }
         ),
         BottomNavigationItem(

@@ -4,7 +4,11 @@ import androidx.annotation.StringRes
 import com.example.heybooks.R
 
 sealed class Screen(val route: String, @StringRes val resourceId: Int) {
+    object Reading : Screen("Reading", R.string.text_bookList)
+    object Admin : Screen("Admin", R.string.text_bookList)
+
     object Login : Screen("Login", R.string.text_bookList)
+
     object SignUp : Screen("SignUp", R.string.text_bookList)
     object LogOut : Screen("LogOut", R.string.text_bookList)
     object Saved : Screen("Saved", R.string.text_bookList)

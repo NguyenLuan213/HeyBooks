@@ -22,18 +22,29 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
+import com.example.books.model.BookItems
 
 import com.example.heybooks.ui.theme.primary
 import com.example.heybooks.ui.theme.text
 import com.example.heybooks.ui.theme.typography
-import com.example.heybooks.utils.coloredShadow
 
 
 val h2 = typography.displayLarge
@@ -50,12 +61,14 @@ val subtitle2 = typography.titleMedium
 val subtitle1 = typography.titleLarge
 @Composable
 fun ItemBookList(
-    title: String,
-    author: String,
-    thumbnailUrl: String,
-    categories: List<String>,
-    onItemClick: () -> Unit
+    book: BookItems,
+    isBookmarked: Boolean,
+    onItemClick: () -> Unit,
+    onSaveClick: () -> Unit,
+    onRemoveClick: () -> Unit
 ) {
+    var bookmarked by remember { mutableStateOf(isBookmarked) }
+
     Card(
         modifier = Modifier
             .clickable(onClick = onItemClick)
@@ -66,7 +79,6 @@ fun ItemBookList(
             .padding(12.dp)
     ) {
 
-        // Row - Image + Content
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -74,10 +86,9 @@ fun ItemBookList(
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Image
             Image(
                 painter = rememberImagePainter(
-                    data = thumbnailUrl
+                    data = book.imageUrl
                 ),
                 contentDescription = null,
                 modifier = Modifier
@@ -88,25 +99,33 @@ fun ItemBookList(
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            // Content
             Column {
-                Text(text = "b".plus(author), style = caption, color = text.copy(0.7F))
+                Text(text = book.authors?:"", style = caption, color = text.copy(0.7F))
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(text = title, style = subtitle1, color = text)
-                Spacer(modifier = Modifier.height(12.dp))
-                FlowRow {
-                    categories.forEach {
-                        ChipView(category = it)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = book.title?:"", style = subtitle1, color = text)
+                    IconButton(onClick = {
+                        bookmarked = !bookmarked
+                        if (bookmarked) onSaveClick() else onRemoveClick()
+                    }) {
+                        Icon(
+                            imageVector = if (bookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                            contentDescription = if (bookmarked) "Remove Bookmark" else "Add Bookmark",
+                            tint = if (bookmarked) Color.Black else Color.Gray
+                        )
                     }
                 }
+
+                Spacer(modifier = Modifier.height(12.dp))
+                ChipView(category = book.categories)
             }
-
         }
-
     }
 }
-
-
 
 @Composable
 fun ChipView(category: String) {
@@ -120,6 +139,7 @@ fun ChipView(category: String) {
         Text(text = category, style = caption, color = primary)
     }
 }
+
 //
 //@Preview(showBackground = true, showSystemUi = true)
 //@Composable

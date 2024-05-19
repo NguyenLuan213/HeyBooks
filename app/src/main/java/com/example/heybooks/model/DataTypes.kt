@@ -1,4 +1,4 @@
-package com.example.heybooks.Data
+package com.example.heybooks.model
 
 data class UseData (
     var userId: String?="",

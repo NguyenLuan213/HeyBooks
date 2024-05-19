@@ -1,4 +1,4 @@
-package com.example.heybooks.Data
+package com.example.heybooks.model
 
 open class Event <out T>(val content: T) {
     var hasBeenhandle = false

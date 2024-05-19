@@ -34,9 +34,9 @@ import com.example.heybooks.ui.theme.text
 @Composable
 fun BookDetailsCard(
     title: String,
-    authors: List<String>,
+    authors: String,
     thumbnailUrl: String,
-    categories: List<String>
+    categories: String
 ) {
 
     // Transparent white bg
@@ -70,9 +70,9 @@ fun BookDetailsCard(
 @Composable
 fun BookImageContentView(
     title: String,
-    authors: List<String>,
+    authors: String,
     thumbnailUrl: String,
-    categories: List<String>
+    categories: String
 ) {
     // content
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -109,12 +109,12 @@ fun BookImageContentView(
                 textAlign = TextAlign.Center,
                 color = text.copy(0.7F)
             )
-            Spacer(modifier = Modifier.height(12.dp))
-            FlowRow {
-                categories.forEach {
-                    ChipView(category = it)
-                }
-            }
+//            Spacer(modifier = Modifier.height(12.dp))
+//            FlowRow {
+//                categories.forEach {
+//                    ChipView(category = it)
+//                }
+//            }
         }
     }
 }

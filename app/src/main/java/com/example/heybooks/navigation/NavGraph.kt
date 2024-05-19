@@ -1,6 +1,7 @@
 package com.example.heybooks.navigation
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,7 +19,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.heybooks.components.BottomNavigationContent
 import com.example.heybooks.view.BookDetailsScreen
-import com.example.heybooks.view.BookListScreen
 import com.example.heybooks.view.LoginScreen
 import com.example.heybooks.view.ProfileScreen
 import com.example.heybooks.view.SavedBookScreen
@@ -26,7 +26,11 @@ import com.example.heybooks.view.SignUpScreen
 import com.example.heybooks.viewmodel.MainViewModel
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import com.example.heybooks.view.AdminHomeScreen
+import com.example.heybooks.view.BookListScreen
 import com.example.heybooks.view.EditProfileScreen
+import com.example.heybooks.view.ReadingScreen
+import com.example.heybooks.view.ReviewScreen
 
 object EndPoints {
     const val ID = "id"
@@ -51,6 +55,35 @@ fun NavGraph() {
 
     NavHost(navController, startDestination = Screen.Login.route) {
 
+        composable(
+            route = "${Screen.Reading.route}/{bookContent}",
+            arguments = listOf(navArgument("bookContent") { type = NavType.StringType })
+        ) { navBackStackEntry ->
+            val viewModel = hiltViewModel<MainViewModel>()
+            val bookContent = navBackStackEntry.arguments?.getString("bookContent")
+            if (bookContent != null) {
+                ReadingScreen(viewModel, actions, bookContent)
+                BottomNavigationContent(viewModel, actions, -1)
+            } else {
+                BottomNavigationContent(viewModel, actions, -1)
+            }
+        }
+
+
+
+
+        composable(Screen.BookList.route) {
+            val viewModel: MainViewModel = viewModel(
+                factory = HiltViewModelFactory(LocalContext.current, it)
+            )
+            BookListScreen(viewModel, actions)
+        }
+        composable(Screen.Admin.route) {
+            val viewModel: MainViewModel = viewModel(
+                factory = HiltViewModelFactory(LocalContext.current, it)
+            )
+            AdminHomeScreen(viewModel, actions)
+        }
 
         composable(Screen.Login.route) {
             val viewModel: MainViewModel = viewModel(
@@ -84,24 +117,23 @@ fun NavGraph() {
 
         composable(
             "${Screen.Details.route}/{id}",
-            arguments = listOf(navArgument(EndPoints.ID) { type = NavType.StringType })
-        ) {
-            val viewModel = hiltViewModel<MainViewModel>(it)
-            val isbnNo = it.arguments?.getString(EndPoints.ID)
-                ?: throw IllegalStateException("Book ISBN No' shouldn't be null")
+            arguments = listOf(navArgument("id") { type = NavType.StringType })
+        ) { navBackStackEntry ->
+            val viewModel = hiltViewModel<MainViewModel>()
+            val isbn = navBackStackEntry.arguments?.getString("id")
+            BookDetailsScreen(viewModel, actions, isbn)
 
-            viewModel.getBookByID(context = context, isbnNO = isbnNo)
-            BookDetailsScreen(viewModel, actions)
             BottomNavigationContent(viewModel, actions, -1)
-
         }
+
+
         // Content for each screen
         bottomNavigationItems.forEachIndexed { index, screen ->
             composable(screen.route) {
                 val viewModel: MainViewModel = viewModel(
                     factory = HiltViewModelFactory(LocalContext.current, it)
                 )
-                viewModel.getAllBooks(context = context)
+//                viewModel.getAllBooks()
 
                 when (screen) {
                     Screen.BookList -> BookListScreen(viewModel, actions)
@@ -157,5 +189,12 @@ class MainActions(navController: NavController) {
     val gotoEditProfile: () -> Unit = {
         navController.navigate(Screen.EditProfile.route)
     }
+    val gotoAdmin: () -> Unit = {
+        navController.navigate(Screen.Admin.route)
+    }
+    val gotoBookReading: (String) -> Unit = { bookContent ->
+        navController.navigate("${Screen.Reading.route}/$bookContent")
+    }
+
 
 }
