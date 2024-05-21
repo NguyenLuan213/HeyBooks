@@ -5,11 +5,16 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.books.model.BookItems
 import com.example.books.model.Review
+import com.example.books.model.ReviewWithUserInfo
 import com.example.heybooks.model.Event
 import com.example.heybooks.model.USER_NODE
 import com.example.heybooks.model.UseData
@@ -20,7 +25,7 @@ import com.example.heybooks.utils.LoginViewState
 import com.example.heybooks.utils.ReviewState
 import com.example.heybooks.utils.SavedBooksState
 import com.example.heybooks.utils.SignUpViewState
-import com.example.heybooks.utils.UserState
+import com.example.heybooks.utils.UsersViewState
 import com.example.heybooks.utils.ViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,7 +36,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.toObject
+import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
@@ -39,9 +46,9 @@ import java.util.UUID
 @HiltViewModel
 class MainViewModel @Inject constructor(
     val auth: FirebaseAuth,
-    var db : FirebaseFirestore,
+    var db: FirebaseFirestore,
     val storage: FirebaseStorage
-): ViewModel() {
+) : ViewModel() {
 
 
     var inProcess = mutableStateOf(false)
@@ -51,15 +58,29 @@ class MainViewModel @Inject constructor(
     private val firestore = FirebaseFirestore.getInstance()
 
 
-
     private val _viewState = MutableStateFlow<ViewState>(ViewState.Loading)
     private val _detailViewState = MutableStateFlow<DetailViewState>(DetailViewState.Loading)
-    private val _loginViewState = MutableStateFlow<LoginViewState>(LoginViewState.Loading)
+    private val _loginViewState = MutableStateFlow<LoginViewState>(LoginViewState.Empty)
     private val _signUpViewState = MutableStateFlow<SignUpViewState>(SignUpViewState.Loading)
     private val _savedBooksState = MutableStateFlow<SavedBooksState>(SavedBooksState.Loading)
-    private val _detailViewStateTab = MutableStateFlow<DetailViewStateTab>(DetailViewStateTab.Loading)
-//    private val _reviewsViewState = MutableStateFlow<ReviewState>(ReviewState.Loading)
-//    private val _usersViewState = MutableStateFlow<UsersViewState>(UsersViewState.Loading)
+    private val _detailViewStateTab =MutableStateFlow<DetailViewStateTab>(DetailViewStateTab.Loading)
+    private val _reviewsViewState = MutableStateFlow<ReviewState>(ReviewState.Loading)
+
+
+
+    private val _inProcess = MutableLiveData<Boolean>()
+    val iinProcess: LiveData<Boolean> get() = _inProcess
+    //bookList
+    private val _viewLiveData = MutableLiveData<ViewState>()
+    val viewLiveData: LiveData<ViewState> get() = _viewLiveData
+
+    //review
+    private val _reviewsLiveData = MutableLiveData<ReviewState>()
+    val reviewsLiveData: LiveData<ReviewState> get() = _reviewsLiveData
+
+    //user
+    private val _usersViewState = MutableLiveData<UsersViewState>()
+    val usersViewState: LiveData<UsersViewState> get() = _usersViewState
 
     val savedBooksState = _savedBooksState.asStateFlow()
     val books = _viewState.asStateFlow()
@@ -67,8 +88,10 @@ class MainViewModel @Inject constructor(
     val login = _loginViewState.asStateFlow()
     val signup = _signUpViewState.asStateFlow()
     val bookDetailsTab = _detailViewStateTab.asStateFlow()
-//    val reviews =  _reviewsViewState.asStateFlow()
-//    val users =  _usersViewState.asStateFlow()
+
+    val reviews = _reviewsViewState.asStateFlow()
+
+    //    val users =  _usersViewState.asStateFlow()
     init {
         val currentUser = auth.currentUser
         signIn.value = currentUser != null
@@ -79,51 +102,163 @@ class MainViewModel @Inject constructor(
     }
 
 
-    private val _reviewsViewState = MutableStateFlow<ReviewState>(ReviewState.Loading)
-    val reviewsViewState: StateFlow<ReviewState> get() = _reviewsViewState
 
-    private val _usersViewState = MutableStateFlow<UserState>(UserState.Loading)
-    val usersViewState: StateFlow<UserState> get() = _usersViewState
-//    fun getBookByIsbn(isbn: String?): BookItems? {
+    //    fun getBookByIsbn(isbn: String?): BookItems? {
 //        return _viewState.value.find { it.isbn == isbn }
 //    }
-    fun addReview(isbn: String, comment: String) = viewModelScope.launch {
+
+    private val _bookListLiveData = MutableLiveData<List<BookItems>>()
+    val bookListLiveData: LiveData<List<BookItems>> = _bookListLiveData
+
+    //Thêm Sửa Xóa Sách
+    fun deleteBook(isbn: String, context: Context) = viewModelScope.launch {
+        try {
+            // Lấy sách từ Firestore
+            val bookRef = firestore.collection("Books").document(isbn)
+            val bookDocument = bookRef.get().await()
+            val book = bookDocument.toObject(BookItems::class.java)
+            val imageRef = book?.let { storage.getReferenceFromUrl(it.imageUrl) }
+            try {
+                imageRef?.delete()?.await()
+                bookRef.delete().await()
+            } catch (e: Exception) {
+                bookRef.delete().await()
+            }
+            getAllBooks()
+            Toast.makeText(
+                context, "Succeeded", Toast.LENGTH_SHORT
+            ).show()
+        } catch (e: Exception) {
+            Toast.makeText(
+                context, "Faill", Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    fun deleteReviews(reviewId: String, isbn: String, context: Context) = viewModelScope.launch {
+        try {
+            val reviewRef = firestore.collection("Reviews").document(reviewId)
+            reviewRef.delete().await()
+            loadReviews(isbn)
+            Toast.makeText(
+                context, "Succeeded", Toast.LENGTH_SHORT
+            ).show()
+        } catch (e: Exception) {
+            Toast.makeText(
+                context, "Fail", Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    fun deleteImg(imageUrl: String) = viewModelScope.launch {
+        try {
+            val storageRef = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrl)
+            storageRef.delete().await()
+            getAllBooks()
+        } catch (e: Exception) {
+            Log.e("DeleteImage", "Failed to delete image: ${e.message}")
+        }
+    }
+
+
+    fun updateBook(
+        isbn: String,
+        title: String,
+        authors: String,
+        categories: String,
+        bookIntroduction: String,
+        bookContent: String,
+        imageUrl: String,
+    ) = viewModelScope.launch {
+        val bookData = hashMapOf(
+            "title" to title,
+            "authors" to authors,
+            "categories" to categories,
+            "bookIntroduction" to bookIntroduction,
+            "bookContent" to bookContent,
+            "imageUrl" to imageUrl
+        )
+        try {
+            firestore.collection("Books")
+                .document(isbn)
+                .update(bookData as Map<String, Any>)
+                .await()
+            getAllBooks()
+            Log.d("MainViewModel", "Book updated successfully")
+        } catch (e: Exception) {
+            Log.e("MainViewModel", "Error updating book", e)
+        }
+
+    }
+
+
+    fun addReview(isbn: String, comment: String, context: Context) = viewModelScope.launch {
         val userId = auth.currentUser?.uid ?: return@launch
-        val reviewId = firestore.collection("Reviews").document().id
+        val currentTime = System.currentTimeMillis()
         val review = Review(
-            reviewId = reviewId,
+            reviewId = currentTime.toString(),
             isbn = isbn,
             userId = userId,
             comment = comment
         )
-        firestore.collection("Reviews").document(reviewId).set(review).await()
+        firestore.collection("Reviews")
+            .document(review.reviewId)
+            .set(review)
+            .addOnSuccessListener {
+                Toast.makeText(
+                    context, "Succeeded", Toast.LENGTH_SHORT
+                ).show()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(
+                    context, "Succeeded", Toast.LENGTH_SHORT
+                ).show()
+            }
         loadReviews(isbn)
     }
 
     fun loadReviews(isbn: String) = viewModelScope.launch {
-        _reviewsViewState.value = ReviewState.Loading
         try {
             val snapshot = firestore.collection("Reviews")
                 .whereEqualTo("isbn", isbn)
                 .get()
                 .await()
-            val reviewsList = snapshot.toObjects(Review::class.java)
-            _reviewsViewState.value = ReviewState.Success(reviewsList)
+
+            val reviewsList = mutableListOf<ReviewWithUserInfo>()
+
+            for (document in snapshot.documents) {
+                val review = document.toObject(Review::class.java)
+                review?.let {
+                    // Lấy thông tin của người dùng từ bảng Users
+                    val userId = it.userId
+                    val userSnapshot = firestore.collection("User").document(userId).get().await()
+                    val userName = userSnapshot.getString("name")
+                    val imageUrl = userSnapshot.getString("imageUrl")
+
+                    // Tạo ra một đối tượng ReviewWithUserInfo
+                    val reviewWithUserInfo = ReviewWithUserInfo(
+                        reviewId = it.reviewId,
+                        isbn = it.isbn,
+                        userId = it.userId,
+                        comment = it.comment,
+                        userName = userName ?: "Unknown",
+                        imageUrl = imageUrl ?: "Unknown"
+                    )
+
+                    reviewsList.add(reviewWithUserInfo)
+                }
+            }
+
+            reviewsList.sortByDescending { it.reviewId }
+//            sortBy
+
+//            _reviewsViewState.value = ReviewState.Success(reviewsList)
+            _reviewsLiveData.postValue(ReviewState.Success(reviewsList))
         } catch (e: Exception) {
             _reviewsViewState.value = ReviewState.Error(e)
         }
     }
 
-    fun loadUsers() = viewModelScope.launch {
-        _usersViewState.value = UserState.Loading
-        try {
-            val snapshot = firestore.collection("Users").get().await()
-            val usersList = snapshot.toObjects(UseData::class.java)
-            _usersViewState.value = UserState.Success(usersList)
-        } catch (e: Exception) {
-            _usersViewState.value = UserState.Error(e)
-        }
-    }
     fun getSavedBooksForUser() = viewModelScope.launch {
         val userId = auth.currentUser?.uid ?: return@launch
         try {
@@ -143,7 +278,8 @@ class MainViewModel @Inject constructor(
     fun saveBookForUser(book: BookItems) = viewModelScope.launch {
         val userId = auth.currentUser?.uid ?: return@launch
         try {
-            val bookWithUserId = book.copy(userId = userId) // Tạo một bản sao của sách với userId mới
+            val bookWithUserId =
+                book.copy(userId = userId) // Tạo một bản sao của sách với userId mới
             firestore.collection("SavedBooks")
                 .document(userId)
                 .collection("Books")
@@ -151,7 +287,7 @@ class MainViewModel @Inject constructor(
                 .set(bookWithUserId)
                 .await()
         } catch (e: Exception) {
-            // Xử lý lỗi
+
         }
     }
 
@@ -168,71 +304,57 @@ class MainViewModel @Inject constructor(
             // Handle error
         }
     }
-    // get all the data from the Book.json
+
     fun getAllBooks() = viewModelScope.launch {
         try {
             val booksSnapshot = firestore.collection("Books").get().await()
             val bookList = booksSnapshot.toObjects(BookItems::class.java)
+            bookList.sortByDescending { it.isbn }
+            _viewLiveData.postValue(ViewState.Success(bookList))
             _viewState.value = ViewState.Success(bookList)
         } catch (e: Exception) {
             _viewState.value = ViewState.Error(e)
         }
     }
 
-    fun fetchBookData(callback: (List<BookItems>) -> Unit) = viewModelScope.launch  {
-        val db = FirebaseFirestore.getInstance()
-        val productsCollection = db.collection("Books")
-
-        productsCollection.get()
-            .addOnSuccessListener { querySnapshot ->
-                val toList = mutableListOf<BookItems>()
-                for (document in querySnapshot.documents) {
-                    val product = document.toObject(BookItems::class.java)
-                    product?.let {
-                        toList.add(it)
-                    }
-                }
-                callback(toList)
-            }
-            .addOnFailureListener { exception ->
-                Log.e("Firestore", "Error getting products", exception)
-            }
-    }
     fun addBook(
-        title: String, authors: String, categories: String,bookintroduction: String, bookcontent:String, imageUrl: String, context: Context
+        title: String,
+        authors: String,
+        categories: String,
+        bookintroduction: String,
+        bookcontent: String,
+        imageUrl: String,
+        context: Context
     ) {
-        // Tạo một tham chiếu đến Firestore.
-        val db = FirebaseFirestore.getInstance()
+        val currentTime = System.currentTimeMillis().toString()
+        val dbBooks = firestore.collection("Books")
 
-        // Tạo một collection reference cho bảng "Books".
-        val dbBooks = db.collection("Books")
-
-        // Tạo một document mới với key tự động.
-        val newBookDoc = dbBooks.document()
-
-        // Lấy key của document mới tạo.
-        val isbn = newBookDoc.id
-
-        // Tạo một đối tượng BookItems với các thông tin cần thiết.
-        val bookItem = BookItems(isbn = isbn, title = title, authors = authors, categories = categories,bookintroduction = bookintroduction, bookcontent = bookcontent, imageUrl = imageUrl)
-
-        // Thêm dữ liệu vào Firestore.
+        // Tạo một document mới với key currentTime.
+        val newBookDoc = dbBooks.document(currentTime)
+        val bookItem = BookItems(
+            isbn = currentTime,
+            title = title,
+            authors = authors,
+            categories = categories,
+            bookintroduction = bookintroduction,
+            bookcontent = bookcontent,
+            imageUrl = imageUrl
+        )
         newBookDoc.set(bookItem)
             .addOnSuccessListener {
-                // Thành công.
                 Toast.makeText(
-                    context, "Thành công", Toast.LENGTH_SHORT
+                    context, "Succeeded", Toast.LENGTH_SHORT
                 ).show()
             }
             .addOnFailureListener { e ->
-                // Thất bại.
                 Toast.makeText(
-                    context, "Thất bại\n$e", Toast.LENGTH_SHORT
+                    context, "Faill\n$e", Toast.LENGTH_SHORT
                 ).show()
             }
     }
-    fun uploadToStorage(uri: Uri, context: Context, type: String, onSuccess: (String) -> Unit) {
 
+
+    fun uploadToStorage(uri: Uri, context: Context, type: String, onSuccess: (String) -> Unit) {
         val storageRef = storage.reference
         val unique_image_name = UUID.randomUUID().toString()
         val spaceRef = storageRef.child("images/$unique_image_name.jpg")
@@ -269,6 +391,33 @@ class MainViewModel @Inject constructor(
             }
         }
     }
+
+    fun uploadImg(uri: Uri, context: Context, imageName: String, onComplete: (String) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val storageRef = Firebase.storage.reference
+                val imageRef = storageRef.child("images/$imageName.jpg")
+
+                // Upload the file
+                val uploadTask = imageRef.putFile(uri).await()
+
+                // Get the download URL
+                val downloadUrl = imageRef.downloadUrl.await().toString()
+                onComplete(downloadUrl)
+                Toast.makeText(
+                    context, "Success",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } catch (e: Exception) {
+                // Handle the error
+                Toast.makeText(
+                    context, "Fail",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
     // get book by ID
     suspend fun getBookByID(isbnNO: String) {
         try {
@@ -280,44 +429,13 @@ class MainViewModel @Inject constructor(
                 val bookData = document.toObject(BookItems::class.java)
                 _detailViewState.value = bookData?.let { DetailViewState.Success(it) }!!
             } else {
-                _detailViewState.value = DetailViewState.Error(Exception("Book not found for ISBN: $isbnNO"))
+                _detailViewState.value =
+                    DetailViewState.Error(Exception("Book not found for ISBN: $isbnNO"))
             }
         } catch (e: Exception) {
             _detailViewState.value = DetailViewState.Error(e)
         }
     }
-
-
-//    fun getBookByID(context: Context, isbnNO:String) = viewModelScope.launch {
-//        try {
-//
-//            // read JSON File
-//            val myJson = context.assets.open("books.json").bufferedReader().use {
-//                it.readText()
-//            }
-//
-//            // format JSON
-//            val bookList = format.decodeFromString<List<BookItem>>(myJson) .filter { it.isbn.contentEquals(isbnNO)}.first()
-//            _detailViewState.value = DetailViewState.Success(bookList)
-//
-//        } catch (e: Exception){
-//            _detailViewState.value = DetailViewState.Error(e)
-//        }
-//    }
-
-    //check email
-
-//    fun loginIn(email: String, password: String) {
-//
-//        if (email.isEmpty() or password.isEmpty()) {
-////            handleException(customMessage = "Please fill")
-//            return
-//
-//        } else {
-////            getAllBooks(context = context)
-//        }
-//    }
-
 
     fun handleException(exception: Exception? = null, customMessage: String = "") {
         Log.e("App ", "Book execption:", exception)
@@ -327,8 +445,6 @@ class MainViewModel @Inject constructor(
         eventMutableState.value = Event(message)
         inProcess.value = false
     }
-
-
 
 
     @SuppressLint("SuspiciousIndentation")
@@ -343,7 +459,7 @@ class MainViewModel @Inject constructor(
                 userId = uid,
                 name = name ?: userData.value?.name,
                 number = number ?: userData.value?.number,
-                 imageUrl = imageUrl ?: userData.value?.imageUrl
+                imageUrl = imageUrl ?: userData.value?.imageUrl
             )
 
             inProcess.value = true
@@ -353,11 +469,9 @@ class MainViewModel @Inject constructor(
                     db.collection(USER_NODE).document(uid).set(useData, SetOptions.merge())
                         .addOnSuccessListener {
                             inProcess.value = false
-                            // You can add success handling here
                         }
                         .addOnFailureListener { exception ->
                             inProcess.value = false
-                            handleException(exception, "Cannot update user")
                         }
                 } else {
                     // Create new user data
@@ -368,12 +482,10 @@ class MainViewModel @Inject constructor(
                         }
                         .addOnFailureListener { exception ->
                             inProcess.value = false
-                            handleException(exception, "Cannot create user")
                         }
                 }
             }.addOnFailureListener { exception ->
                 inProcess.value = false
-                handleException(exception, "Cannot retrieve user")
             }
         }
     }
@@ -381,7 +493,6 @@ class MainViewModel @Inject constructor(
     fun signUp(name: String, number: String, email: String, password: String, context: Context) {
         inProcess.value = true
         if (name.isEmpty() or number.isEmpty() or email.isEmpty() or password.isEmpty()) {
-            handleException(customMessage = " Please Fill")
             Toast.makeText(
                 context, "Please Fill",
                 Toast.LENGTH_SHORT
@@ -391,18 +502,15 @@ class MainViewModel @Inject constructor(
         inProcess.value = true
         db.collection(USER_NODE).whereEqualTo("number", number).get().addOnSuccessListener {
             if (it.isEmpty) {
-
                 auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
                     if (it.isSuccessful) {
                         signIn.value = true
-                        createOrUpdateProfile(name, number,)
-                        Log.d("TAG", "signup: User Logged In")
+                        createOrUpdateProfile(name, number)
                         Toast.makeText(
                             context, "Successfully",
                             Toast.LENGTH_SHORT
                         ).show()
                     } else {
-                        handleException(it.exception, customMessage = "sign up failed")
                         Toast.makeText(
                             context, "Sign up failed",
                             Toast.LENGTH_SHORT
@@ -410,15 +518,17 @@ class MainViewModel @Inject constructor(
                     }
                 }
             } else {
-                handleException(customMessage = "number already exit")
+                Toast.makeText(
+                    context, "number already exit",
+                    Toast.LENGTH_SHORT
+                ).show()
                 inProcess.value = false
             }
         }
     }
 
-    fun loginIn(email: String, password: String, context: Context, actions: MainActions){
+    fun loginIn(email: String, password: String, context: Context, actions: MainActions) {
         if (email.isEmpty() or password.isEmpty()) {
-            handleException(customMessage = "Please fill")
             Toast.makeText(
                 context, "Please Fill",
                 Toast.LENGTH_SHORT
@@ -433,54 +543,96 @@ class MainViewModel @Inject constructor(
 //                        signIn.value = false
 //                        inProcess.value = true
                         // Navigate to admin screen
-                        actions.gotoAdmin()
-                    }
-                    if (it.isSuccessful && email != "admin@gmail.com") {
-                        signIn.value = true
-                        inProcess.value = false
-                        auth.currentUser?.uid?.let {
-                            getUserData(it)
+                        actions.gotoAdminBookList()
+                    } else
+                        if (it.isSuccessful && email != "admin@gmail.com") {
+                            signIn.value = true
+                            inProcess.value = false
+                            auth.currentUser?.uid?.let {
+                                getUserData(it)
+                            }
+                        } else {
+                            Toast.makeText(
+                                context, "Login fail",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
-                    } else {
-                        handleException(exception = it.exception, customMessage = " login failed")
-                        Toast.makeText(
-                            context, "Login fail",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
                 }
         }
 
     }
 
-    fun logOut(){
+
+    fun logOut() {
         auth.signOut()
-        signIn.value=false
-        userData.value=null
-//        depopulateMessage()
-        eventMutableState.value= Event("Logged Out")
+        signIn.value = false
+        userData.value = null
+        eventMutableState.value = Event("Logged Out")
     }
 
     private fun getUserData(uid: String) {
         inProcess.value = true
         db.collection(USER_NODE).document(uid).addSnapshotListener { value, error ->
-
-
             if (error != null) {
-                handleException(error, " Con not retreive User")
+                Log.e("getUserData", "Con not retreive User")
             }
             if (value != null) {
                 var user = value.toObject<UseData>()
                 userData.value = user
                 inProcess.value = false
-//                populateChats()
-//                populateStatuses()
             }
         }
     }
 
-    fun updateProfile(){
 
+    fun loadUser() = viewModelScope.launch {
+        _usersViewState.value = UsersViewState.Loading
+        try {
+            val userId = auth.currentUser?.uid ?: return@launch
+            val userSnapshot = firestore.collection("User").document(userId).get().await()
+            if (userSnapshot.exists()) {
+                val userData = userSnapshot.toObject(UseData::class.java)
+                userData?.let {
+                    _usersViewState.value = UsersViewState.Success(listOf(it))
+                } ?: run {
+                    _usersViewState.value = UsersViewState.Empty
+                }
+            } else {
+                _usersViewState.value = UsersViewState.Empty
+            }
+        } catch (e: Exception) {
+            _usersViewState.value = UsersViewState.Error(e)
+            Log.d("loadUser", "Load user failed", e)
+        }
     }
 
+    fun updateProfile(uid: String, name: String, number: String, imageUrl: String) =viewModelScope.launch {
+        val usersData = hashMapOf(
+            "userId" to uid,
+            "name" to name,
+            "number" to number,
+            "imageUrl" to imageUrl
+        )
+        try {
+            firestore.collection("User")
+                .document(uid)
+                .update(usersData as Map<String, Any>)
+                .await()
+            getAllBooks()
+            Log.d("updateProfile", "Profile updated successfully")
+        } catch (e: Exception) {
+            Log.e("updateProfile", "Error updating profile", e)
+        }
+    }
+
+}
+
+@Composable
+fun CheckSignedIn(viewModel: MainViewModel, actions: MainActions) {
+    val alreadySignIn = remember { mutableStateOf(false) }
+    val signIn = viewModel.signIn.value
+    if (signIn && !alreadySignIn.value) {
+        alreadySignIn.value = true
+        actions.gotoBookList()
+    }
 }

@@ -21,4 +21,5 @@ fun LoadingScreen() {
             color = androidx.compose.ui.graphics.Color.Blue
         )
     }
+    return
 }

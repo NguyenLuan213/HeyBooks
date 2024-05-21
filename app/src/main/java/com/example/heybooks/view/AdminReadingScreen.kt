@@ -24,7 +24,7 @@ import com.example.heybooks.viewmodel.MainViewModel
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun ReadingScreen(
+fun AdminReadingScreen(
     viewModel: MainViewModel, actions: MainActions, bookContent: String?
 ) {
     Scaffold(

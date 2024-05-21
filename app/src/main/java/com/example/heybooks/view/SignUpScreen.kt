@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -38,7 +39,7 @@ import androidx.compose.ui.unit.sp
 import com.example.heybooks.R
 import com.example.heybooks.components.ClickTextLogin
 import com.example.heybooks.navigation.MainActions
-import com.example.heybooks.utils.CheckSignedIn
+import com.example.heybooks.viewmodel.CheckSignedIn
 import com.example.heybooks.viewmodel.MainViewModel
 
 @Composable
@@ -52,13 +53,14 @@ fun SignUpScreen(viewModel: MainViewModel, actions: MainActions) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .offset(y = (-12).dp)
     ) {
         Image(
             painter = backgroundImage,
             contentDescription = null,
-            modifier = Modifier.fillMaxSize()
-        )
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+
+            )
 
         val nameState = remember {
             mutableStateOf(TextFieldValue())

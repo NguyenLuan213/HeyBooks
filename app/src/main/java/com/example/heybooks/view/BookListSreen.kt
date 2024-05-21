@@ -13,6 +13,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -35,16 +37,11 @@ import com.example.heybooks.viewmodel.MainViewModel
 @ExperimentalComposeUiApi
 @Composable
 fun BookListScreen(viewModel: MainViewModel = hiltViewModel(), actions: MainActions) {
-    LaunchedEffect(Unit) {
-        viewModel.getAllBooks()
-    }
-
-    when (val result = viewModel.books.value) {
-         ViewState.Loading -> LoadingScreen()
+    val viewState by viewModel.viewLiveData.observeAsState(initial = ViewState.Loading)
+    when (val result = viewState) {
+        ViewState.Loading -> LoadingScreen()
         is ViewState.Error -> Text(text = "Error found: ${result.exception.message}")
-        is ViewState.Success -> {
-            BookList(result.data, viewModel, actions)
-        }
+        is ViewState.Success -> BookList(result.data, viewModel, actions)
         ViewState.Empty -> Text("No results found!")
     }
 }
@@ -53,9 +50,9 @@ fun BookListScreen(viewModel: MainViewModel = hiltViewModel(), actions: MainActi
 @ExperimentalComposeUiApi
 @Composable
 fun BookList(bookList: List<BookItems>, viewModel: MainViewModel, actions: MainActions) {
+//    viewModel.getAllBooks()
     val search = remember { mutableStateOf("") }
     val listState = rememberLazyListState()
-
     val filteredBooks = bookList.filter { it.title.contains(search.value, ignoreCase = true) }
 
     LazyColumn(

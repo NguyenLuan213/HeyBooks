@@ -1,7 +1,6 @@
 package com.example.books.model
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
 @Serializable
 data class BookItems(
@@ -21,8 +20,18 @@ data class Review(
     val reviewId: String = "",
     val isbn: String = "",
     val userId: String = "",
-    val comment: String = ""
+    val comment: String = "",
 )
+@Serializable
+data class ReviewWithUserInfo(
+    val reviewId: String = "",
+    val isbn: String = "",
+    val userId: String = "",
+    val comment: String = "",
+    val userName: String = "",
+    val imageUrl: String = "",
+)
+
 
 
 @Serializable
