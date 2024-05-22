@@ -59,7 +59,7 @@ fun AdminCommentItem(
         ) {
             Column {
                 ConstraintLayout {
-                    val (imgAvt, txtname, txtcontent, deleteIcon) = createRefs()
+                    val (imgAvt, txtname, txtcontent) = createRefs()
                     Box(
                         modifier = Modifier
                             .size(100.dp)
@@ -68,27 +68,18 @@ fun AdminCommentItem(
                                 start.linkTo(parent.start, margin = 10.dp)
                             }
                     )
-                        if (thumbnailUrl != null){
-                            Image(
-                                painter = rememberImagePainter(
-                                    data = thumbnailUrl
-                                ),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .clip(CircleShape),
-                                contentScale = ContentScale.Crop,
-                            )
-                        }else{
-                            Image(
-                                painter = painterResource(id = R.drawable.avatar),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .clip(CircleShape),
-                                contentScale = ContentScale.Crop,
-                            )
-                        }
+                    {
+                        Image(
+                            painter = rememberImagePainter(
+                                data = thumbnailUrl
+                            ),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop,
+                        )
+                    }
 
                     Box(
                         modifier = Modifier.constrainAs(txtname) {

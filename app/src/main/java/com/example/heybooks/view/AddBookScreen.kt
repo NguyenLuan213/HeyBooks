@@ -30,6 +30,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.heybooks.components.DrawerContent
@@ -117,7 +118,7 @@ fun AddBook(
                 value = titleState,
                 onValueChange = { titleState = it },
                 label = { Text("Title") },
-                textStyle = TextStyle(Color.Black),
+                textStyle = TextStyle(Color.Black, textAlign = TextAlign.Justify),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
                 keyboardOptions = KeyboardOptions(
@@ -135,7 +136,7 @@ fun AddBook(
                 value = authorsState,
                 onValueChange = { authorsState = it },
                 label = { Text("Authors") },
-                textStyle = TextStyle(Color.Black),
+                textStyle = TextStyle(Color.Black, textAlign = TextAlign.Justify),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
                 keyboardOptions = KeyboardOptions(
@@ -152,7 +153,7 @@ fun AddBook(
                 value = categoriesState,
                 onValueChange = { categoriesState = it },
                 label = { Text("Categories") },
-                textStyle = TextStyle(Color.Black),
+                textStyle = TextStyle(Color.Black, textAlign = TextAlign.Justify),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
                 keyboardOptions = KeyboardOptions(
@@ -169,7 +170,7 @@ fun AddBook(
                 value = bookintroductionState,
                 onValueChange = { bookintroductionState = it },
                 label = { Text("Book Introduction") },
-                textStyle = TextStyle(Color.Black),
+                textStyle = TextStyle(Color.Black, textAlign = TextAlign.Justify),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
                 keyboardOptions = KeyboardOptions(
@@ -186,7 +187,7 @@ fun AddBook(
                 value = bookcontentState,
                 onValueChange = { bookcontentState = it },
                 label = { Text("Book Content") },
-                textStyle = TextStyle(Color.Black),
+                textStyle = TextStyle(Color.Black, textAlign = TextAlign.Justify),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
                 keyboardOptions = KeyboardOptions(

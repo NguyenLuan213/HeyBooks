@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Tab
@@ -98,12 +99,12 @@ fun BookDetailsTab(book: BookItems, actions: MainActions, viewModel: MainViewMod
     Column() {
         TabRow(selectedTabIndex = selectedTabIndex,
             backgroundColor = Color.Gray, // Màu nền của TabRow
-            contentColor = Color.Red,  // Màu của indicator
+            contentColor = Color(0xFF558BEB),  // Màu của indicator
             indicator = { tabPositions ->
                 TabRowDefaults.Indicator(
                     Modifier
                         .tabIndicatorOffset(tabPositions[selectedTabIndex])
-                        .height(4.dp) // Chiều cao của indicator
+                        .height(3.dp) // Chiều cao của indicator
                         .background(Color.Yellow) // Màu của indicator
                 )
             }
@@ -120,7 +121,7 @@ fun BookDetailsTab(book: BookItems, actions: MainActions, viewModel: MainViewMod
                     },
                     modifier = Modifier.background(Color.White),
 
-                    selectedContentColor = Color.Yellow,  // Màu khi tab được chọn
+                    selectedContentColor = Color(0xFF749EE9),  // Màu khi tab được chọn
                     unselectedContentColor = Color.LightGray
                 )
             }
@@ -175,7 +176,7 @@ fun TabContent1(book: BookItems, actions: MainActions) {
                 .constrainAs(button) {
                     bottom.linkTo(parent.bottom)
                 }
-                .padding(bottom = 80.dp)
+                .padding(bottom = 50.dp)
         ) {
             Button(
                 onClick = { actions.gotoBookReading(bookContent) },
@@ -185,7 +186,8 @@ fun TabContent1(book: BookItems, actions: MainActions) {
                     .padding(bottom = 16.dp)
                     .alpha(0.7f)
                     .background(Color.Transparent),
-                shape = RoundedCornerShape(48.dp)
+                shape = RoundedCornerShape(48.dp),
+                colors = ButtonDefaults.buttonColors(Color(0xFF7eafc8))
 
             ) {
                 Text(text = "Book Content")

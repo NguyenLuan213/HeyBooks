@@ -12,7 +12,7 @@ val Pink40 = Color(0xFF7D5260)
 
 //chế độ sáng
 val card = Color(0xFFFFFFFF)
-val background = Color(0xFFF9F9F9)
+val background = Color(0xfff3f4f8)
 val primary = Color(0xFF006AF6)
 val text = Color(0xFF000068)
 

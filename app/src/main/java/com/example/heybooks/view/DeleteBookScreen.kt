@@ -22,7 +22,7 @@ fun DeleteBookScreen(viewModel: MainViewModel,
         onDismissRequest = {
             onDismiss()
         },
-        title = {Text("confirm deletion",style = TextStyle(color = Color(0xFF2196F3), fontSize = 20.sp))
+        title = {Text("Confirm deletion",style = TextStyle(color = Color(0xFF2196F3), fontSize = 20.sp))
 
         },
         text = {

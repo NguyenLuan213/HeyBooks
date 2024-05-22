@@ -69,7 +69,7 @@ fun ReviewScreen(
                     modifier = Modifier
                         .constrainAs(input) {
                             start.linkTo(parent.start)
-                            bottom.linkTo(parent.bottom, margin = 80.dp)
+                            bottom.linkTo(parent.bottom, margin = 55.dp)
                         }
                         .fillMaxWidth()
                         .wrapContentHeight()

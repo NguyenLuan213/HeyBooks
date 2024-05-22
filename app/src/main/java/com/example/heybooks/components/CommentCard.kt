@@ -85,7 +85,7 @@ fun CommentInput(viewModel: MainViewModel, actions: MainActions, isbn : String?)
                 focusManager.clearFocus()
 
             },
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Blue), // Màu nền của nút
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0583F2)), // Màu nền của nút
             shape = RoundedCornerShape(48.dp),
             modifier = Modifier.align(Alignment.CenterVertically)
         ) {

@@ -59,6 +59,7 @@ val body2 = typography.bodyMedium
 val caption = typography.titleSmall
 val subtitle2 = typography.titleMedium
 val subtitle1 = typography.titleLarge
+
 @Composable
 fun ItemBookList(
     book: BookItems,
@@ -74,7 +75,7 @@ fun ItemBookList(
             .clickable(onClick = onItemClick)
             .fillMaxWidth()
             .wrapContentHeight()
-            .background(MaterialTheme.colorScheme.background)
+            .background(Color(0xfff3f4f8))
             .clip(RoundedCornerShape(20.dp))
             .padding(12.dp)
     ) {
@@ -82,7 +83,7 @@ fun ItemBookList(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.onSurface),
+                .background(Color(0xffffffff)),
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -101,14 +102,24 @@ fun ItemBookList(
             Spacer(modifier = Modifier.width(16.dp))
 
             Column {
-                Text(text = book.authors?:"", style = caption, color = text.copy(0.7F))
+                Text(
+                    text = book.authors ?: "",
+                    style = caption,
+                    color = text.copy(0.7F),
+                    modifier = Modifier.width(190.dp)
+                )
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = book.title?:"", style = subtitle1, color = text)
+                    Text(
+                        text = book.title ?: "",
+                        style = subtitle1,
+                        color = text,
+                        modifier = Modifier.width(190.dp)
+                    )
                     IconButton(onClick = {
                         bookmarked = !bookmarked
                         if (bookmarked) onSaveClick() else onRemoveClick()

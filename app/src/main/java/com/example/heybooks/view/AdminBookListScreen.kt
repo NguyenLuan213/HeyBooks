@@ -81,8 +81,10 @@ fun AdminBookListScreen(viewModel: MainViewModel = hiltViewModel(), actions: Mai
                 title = { androidx.compose.material.Text("Admin Dashboard") },
                 backgroundColor = MaterialTheme.colors.primary,
                 actions = {
-                    androidx.compose.material.IconButton(onClick = { viewModel.logOut()
-                        actions.gotoLogOut() }) {
+                    androidx.compose.material.IconButton(onClick = {
+                        viewModel.logOut()
+                        actions.gotoLogOut()
+                    }) {
                         androidx.compose.material.Icon(
                             Icons.Filled.ExitToApp,
                             contentDescription = "Logout"
@@ -116,7 +118,8 @@ fun ContentBookList(viewModel: MainViewModel = hiltViewModel(), actions: MainAct
         is ViewState.Success -> {
             val search = remember { mutableStateOf("") }
             val listState = rememberLazyListState()
-            val filteredBooks = result.data.filter { it.title.contains(search.value, ignoreCase = true) }
+            val filteredBooks =
+                result.data.filter { it.title.contains(search.value, ignoreCase = true) }
             var showEditDialog by remember { mutableStateOf(-1) }
 
             var showDelDialog by remember { mutableStateOf(-1) }
@@ -130,9 +133,6 @@ fun ContentBookList(viewModel: MainViewModel = hiltViewModel(), actions: MainAct
             var uri by remember { mutableStateOf<Uri?>(null) }
 
 
-
-
-
 //            val productPicker = rememberLauncherForActivityResult(
 //                contract = ActivityResultContracts.PickVisualMedia(),
 //                onResult = { uri = it }
@@ -142,7 +142,7 @@ fun ContentBookList(viewModel: MainViewModel = hiltViewModel(), actions: MainAct
             LazyColumn(
                 state = listState,
                 modifier = Modifier
-                    .background(MaterialTheme.colors.background)
+                    .background(Color(0xfff3f4f8))
             ) {
                 stickyHeader {
                     Row(
@@ -201,7 +201,12 @@ fun ContentBookList(viewModel: MainViewModel = hiltViewModel(), actions: MainAct
                 }
             }
             if (showDelDialog != -1) {
-                DeleteBookScreen(viewModel = viewModel, actions = actions, isbn = bookId, showDelDialog = showDelDialog) {
+                DeleteBookScreen(
+                    viewModel = viewModel,
+                    actions = actions,
+                    isbn = bookId,
+                    showDelDialog = showDelDialog
+                ) {
                     showDelDialog = -1
                 }
             }
@@ -227,6 +232,7 @@ fun ContentBookList(viewModel: MainViewModel = hiltViewModel(), actions: MainAct
                 )
             }
         }
+
         ViewState.Empty -> Text("No results found!")
     }
 }

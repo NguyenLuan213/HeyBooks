@@ -112,12 +112,12 @@ fun AdminBookDetailsTab(book: BookItems, actions: MainActions, viewModel: MainVi
     Column() {
         TabRow(selectedTabIndex = selectedTabIndex,
             backgroundColor = Color.Gray, // Màu nền của TabRow
-            contentColor = Color.Red,  // Màu của indicator
+            contentColor = Color(0xFF558BEB),  // Màu của indicator
             indicator = { tabPositions ->
                 TabRowDefaults.Indicator(
                     Modifier
                         .tabIndicatorOffset(tabPositions[selectedTabIndex])
-                        .height(4.dp) // Chiều cao của indicator
+                        .height(3.dp) // Chiều cao của indicator
                         .background(Color.Yellow) // Màu của indicator
                 )
             }
@@ -134,7 +134,7 @@ fun AdminBookDetailsTab(book: BookItems, actions: MainActions, viewModel: MainVi
                     },
                     modifier = Modifier.background(Color.White),
 
-                    selectedContentColor = Color.Yellow,  // Màu khi tab được chọn
+                    selectedContentColor = Color(0xFF749EE9),  // Màu khi tab được chọn
                     unselectedContentColor = Color.LightGray
                 )
             }
@@ -229,7 +229,7 @@ fun AdminTabContent2(book: BookItems, actions: MainActions, viewModel: MainViewM
             ConstraintLayout(
                 modifier = Modifier.fillMaxSize()
             ) {
-                val (contents, input, deleteIcon) = createRefs()
+                val (contents, input) = createRefs()
 
                 LazyColumn(modifier = Modifier
                     .constrainAs(contents) {
@@ -264,8 +264,6 @@ fun AdminTabContent2(book: BookItems, actions: MainActions, viewModel: MainViewM
                 ) {
                     CommentInput(viewModel, actions, book.isbn)
                 }
-
-
 
 
             }

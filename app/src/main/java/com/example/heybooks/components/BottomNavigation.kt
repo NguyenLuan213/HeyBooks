@@ -6,6 +6,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
@@ -47,7 +49,6 @@ data class BottomNavigationItem(
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector,
     val goto: () -> Unit
-
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,9 +79,10 @@ fun BottomNavigationContent(viewModel: MainViewModel, actions: MainActions, sele
     }
 
     Box(
+
         modifier = Modifier.fillMaxSize()
     ) {
-        NavigationBar(modifier = Modifier.align(Alignment.BottomCenter)) {
+        NavigationBar(modifier = Modifier.height(55.dp).align(Alignment.BottomCenter), containerColor = Color(0xFFa0bbf2)) {
             items.forEachIndexed { index, item ->
                 NavigationBarItem(
                     selected = selectedItemIndex == index,

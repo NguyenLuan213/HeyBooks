@@ -57,7 +57,7 @@ fun BookList(bookList: List<BookItems>, viewModel: MainViewModel, actions: MainA
 
     LazyColumn(
         state = listState,
-        modifier = Modifier.background(MaterialTheme.colors.background).padding(bottom = 80.dp)
+        modifier = Modifier.background(Color(0xfff3f4f8)).padding(bottom = 55.dp)
     ) {
         stickyHeader {
             Row(

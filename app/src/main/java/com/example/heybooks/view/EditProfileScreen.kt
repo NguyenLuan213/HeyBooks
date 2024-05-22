@@ -190,7 +190,8 @@ fun EditProfileScreen(viewModel: MainViewModel, actions: MainActions) {
                                         uid = userIdState,
                                         name = nameState,
                                         number = phoneState,
-                                        imageUrl = uploadedImageUrl
+                                        imageUrl = uploadedImageUrl,
+                                        context = context
                                     )
                                     viewModel.deleteImg(imageUrlState) // Delete the old image
                                 }
@@ -199,7 +200,8 @@ fun EditProfileScreen(viewModel: MainViewModel, actions: MainActions) {
                                     uid = userIdState,
                                     name = nameState,
                                     number = phoneState,
-                                    imageUrl = imageUrlState
+                                    imageUrl = imageUrlState,
+                                    context = context
                                 )
                             }
                         },

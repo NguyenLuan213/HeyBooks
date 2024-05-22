@@ -55,11 +55,8 @@ fun TextInputField(label: String, value: String, onValueChanged: (String) -> Uni
     val keyboardController = LocalSoftwareKeyboardController.current
 
     OutlinedTextField(
-
         modifier = Modifier.height(48.dp)
-
             .fillMaxWidth()
-
             .padding(horizontal = 10.dp, vertical = 0.dp),
         value = value,
         onValueChange = {
@@ -88,13 +85,13 @@ fun TextInputField(label: String, value: String, onValueChanged: (String) -> Uni
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun textFieldColors() = TextFieldDefaults.textFieldColors(
-    focusedTextColor = MaterialTheme.colorScheme.primary, // Thay colors.primaryVariant thành MaterialTheme.colors.primary
-    focusedLabelColor = MaterialTheme.colorScheme.primary, // Thay colors.primaryVariant thành MaterialTheme.colors.primary
-    focusedIndicatorColor = MaterialTheme.colorScheme.primary, // Thay colors.primaryVariant thành MaterialTheme.colors.primary
+    focusedTextColor = MaterialTheme.colorScheme.primary,
+    focusedLabelColor = MaterialTheme.colorScheme.primary,
+    focusedIndicatorColor = MaterialTheme.colorScheme.primary,
     unfocusedIndicatorColor = Color.LightGray,
-    cursorColor = MaterialTheme.colorScheme.primary, // Thay colors.primaryVariant thành MaterialTheme.colors.primary
-    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface, // Thay colors.onSurface thành MaterialTheme.colors.onSurface
-    disabledPlaceholderColor = MaterialTheme.colorScheme.onSurface // Thay colors.onSurface thành MaterialTheme.colors.onSurface
+    cursorColor = MaterialTheme.colorScheme.primary,
+    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface,
+    disabledPlaceholderColor = MaterialTheme.colorScheme.onSurface
 )
 @OptIn(ExperimentalComposeUiApi::class)
 @Preview(showSystemUi = true, showBackground = true)

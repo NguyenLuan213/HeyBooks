@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -61,7 +62,7 @@ fun SavedBookList(bookList: List<BookItems>, viewModel: MainViewModel, actions: 
 
     LazyColumn(
         state = listState,
-        modifier = Modifier.background(MaterialTheme.colors.background).padding(bottom = 80.dp)
+        modifier = Modifier.background(Color(0xfff3f4f8)).padding(bottom = 55.dp)
     ) {
         stickyHeader {
             Row(
@@ -75,18 +76,20 @@ fun SavedBookList(bookList: List<BookItems>, viewModel: MainViewModel, actions: 
                     value = search.value,
                     onValueChanged = { search.value = it }
                 )
+
             }
+
         }
 
-        item {
-            Text(
-                text = "Saved books",
-                style = MaterialTheme.typography.subtitle1,
-                color = MaterialTheme.colors.onPrimary,
-                textAlign = TextAlign.Start,
-                modifier = Modifier.padding(start = 16.dp, end = 24.dp, top = 8.dp)
-            )
-        }
+//        item {
+//            Text(
+//                text = "Saved books",
+//                style = MaterialTheme.typography.subtitle1,
+//                color = Color.Red,
+//                textAlign = TextAlign.Center,
+//                modifier = Modifier.padding(start = 16.dp, end = 24.dp, top = 8.dp)
+//            )
+//        }
 
         if (filteredBooks.isEmpty()) {
             item {
@@ -96,7 +99,7 @@ fun SavedBookList(bookList: List<BookItems>, viewModel: MainViewModel, actions: 
                     color = Color.Black,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxSize()
                         .padding(16.dp)
                 )
             }

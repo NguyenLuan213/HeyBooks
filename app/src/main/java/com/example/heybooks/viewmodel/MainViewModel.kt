@@ -50,26 +50,25 @@ class MainViewModel @Inject constructor(
     val storage: FirebaseStorage
 ) : ViewModel() {
 
-
     var inProcess = mutableStateOf(false)
     val eventMutableState = mutableStateOf<Event<String>?>(null)
     var signIn = mutableStateOf(false)
     val userData = mutableStateOf<UseData?>(null)
     private val firestore = FirebaseFirestore.getInstance()
 
-
     private val _viewState = MutableStateFlow<ViewState>(ViewState.Loading)
     private val _detailViewState = MutableStateFlow<DetailViewState>(DetailViewState.Loading)
     private val _loginViewState = MutableStateFlow<LoginViewState>(LoginViewState.Empty)
     private val _signUpViewState = MutableStateFlow<SignUpViewState>(SignUpViewState.Loading)
     private val _savedBooksState = MutableStateFlow<SavedBooksState>(SavedBooksState.Loading)
-    private val _detailViewStateTab =MutableStateFlow<DetailViewStateTab>(DetailViewStateTab.Loading)
+    private val _detailViewStateTab =
+        MutableStateFlow<DetailViewStateTab>(DetailViewStateTab.Loading)
     private val _reviewsViewState = MutableStateFlow<ReviewState>(ReviewState.Loading)
-
 
 
     private val _inProcess = MutableLiveData<Boolean>()
     val iinProcess: LiveData<Boolean> get() = _inProcess
+
     //bookList
     private val _viewLiveData = MutableLiveData<ViewState>()
     val viewLiveData: LiveData<ViewState> get() = _viewLiveData
@@ -100,7 +99,6 @@ class MainViewModel @Inject constructor(
         }
 
     }
-
 
 
     //    fun getBookByIsbn(isbn: String?): BookItems? {
@@ -174,8 +172,8 @@ class MainViewModel @Inject constructor(
             "title" to title,
             "authors" to authors,
             "categories" to categories,
-            "bookIntroduction" to bookIntroduction,
-            "bookContent" to bookContent,
+            "bookintroduction" to bookIntroduction,
+            "bookcontent" to bookContent,
             "imageUrl" to imageUrl
         )
         try {
@@ -404,16 +402,16 @@ class MainViewModel @Inject constructor(
                 // Get the download URL
                 val downloadUrl = imageRef.downloadUrl.await().toString()
                 onComplete(downloadUrl)
-                Toast.makeText(
-                    context, "Success",
-                    Toast.LENGTH_SHORT
-                ).show()
+//                Toast.makeText(
+//                    context, "Success",
+//                    Toast.LENGTH_SHORT
+//                ).show()
             } catch (e: Exception) {
                 // Handle the error
-                Toast.makeText(
-                    context, "Fail",
-                    Toast.LENGTH_SHORT
-                ).show()
+//                Toast.makeText(
+//                    context, "Fail",
+//                    Toast.LENGTH_SHORT
+//                ).show()
             }
         }
     }
@@ -606,7 +604,13 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun updateProfile(uid: String, name: String, number: String, imageUrl: String) =viewModelScope.launch {
+    fun updateProfile(
+        uid: String,
+        name: String,
+        number: String,
+        imageUrl: String,
+        context: Context
+    ) = viewModelScope.launch {
         val usersData = hashMapOf(
             "userId" to uid,
             "name" to name,
@@ -618,10 +622,16 @@ class MainViewModel @Inject constructor(
                 .document(uid)
                 .update(usersData as Map<String, Any>)
                 .await()
-            getAllBooks()
-            Log.d("updateProfile", "Profile updated successfully")
+            loadUser()
+            Toast.makeText(
+                context, "Success",
+                Toast.LENGTH_SHORT
+            ).show()
         } catch (e: Exception) {
-            Log.e("updateProfile", "Error updating profile", e)
+            Toast.makeText(
+                context, "Fail",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
