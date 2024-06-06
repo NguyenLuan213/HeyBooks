@@ -82,7 +82,7 @@ fun SignUpScreen(viewModel: MainViewModel, actions: MainActions) {
                 .fillMaxWidth()
         ) {
             Text(
-                text = "Chào bạn,",
+                text = "Welcome, ",
                 modifier = Modifier
                     .align(Alignment.Start),
                 fontWeight = FontWeight.Bold,
@@ -91,7 +91,7 @@ fun SignUpScreen(viewModel: MainViewModel, actions: MainActions) {
                 color = Color.LightGray
             )
             Text(
-                text = "Đăng nhập để tiếp tục",
+                text = "Sign Up to continue",
                 modifier = Modifier
                     .align(Alignment.Start),
                 fontWeight = FontWeight.Bold,
@@ -102,7 +102,7 @@ fun SignUpScreen(viewModel: MainViewModel, actions: MainActions) {
             OutlinedTextField(
                 value = nameState.value,
                 onValueChange = { nameState.value = it },
-                label = { Text(text = "Tên tài khoản") },
+                label = { Text(text = "Account name") },
                 modifier = Modifier.fillMaxWidth(),
                 textStyle = TextStyle(
                     color = Color.Black,
@@ -113,27 +113,6 @@ fun SignUpScreen(viewModel: MainViewModel, actions: MainActions) {
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(
-                    onNext = { focusManager.moveFocus(focusDirection = FocusDirection.Next) }
-                )
-            )
-            Spacer(modifier = Modifier.height(20.dp))
-            OutlinedTextField(
-                value = numberState.value,
-                onValueChange = { numberState.value = it },
-                label = { Text(text = "Số đt") },
-                modifier = Modifier.fillMaxWidth(),
-                textStyle = TextStyle(
-                    color = Color.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                ),
-                shape = RoundedCornerShape(16.dp),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Next
                 ),
                 keyboardActions = KeyboardActions(
@@ -163,9 +142,31 @@ fun SignUpScreen(viewModel: MainViewModel, actions: MainActions) {
             )
             Spacer(modifier = Modifier.height(20.dp))
             OutlinedTextField(
+                value = numberState.value,
+                onValueChange = { numberState.value = it },
+                label = { Text(text = "Phone number") },
+                modifier = Modifier.fillMaxWidth(),
+                textStyle = TextStyle(
+                    color = Color.Black,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                ),
+                shape = RoundedCornerShape(16.dp),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(focusDirection = FocusDirection.Next) }
+                )
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+            OutlinedTextField(
                 value = passwordState.value,
                 onValueChange = { passwordState.value = it },
-                label = { Text(text = "Mật khẩu") },
+                label = { Text(text = "Password") },
                 modifier = Modifier.fillMaxWidth(),
                 textStyle = TextStyle(
                     color = Color.Black,
@@ -199,7 +200,7 @@ fun SignUpScreen(viewModel: MainViewModel, actions: MainActions) {
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text(text = "Đăng Ký", fontWeight = FontWeight.Bold)
+                Text(text = "SIGN UP", fontWeight = FontWeight.Bold)
             }
 
             Spacer(modifier = Modifier.height(20.dp))

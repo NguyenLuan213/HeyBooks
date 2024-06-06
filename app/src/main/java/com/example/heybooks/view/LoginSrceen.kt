@@ -76,7 +76,7 @@ fun Login(viewModel: MainViewModel, actions: MainActions) {
             val passwordState = remember { mutableStateOf(TextFieldValue()) }
 
             Text(
-                text = "Chào bạn,",
+                text = "Welcome, ",
                 modifier = Modifier.align(Alignment.Start),
                 fontWeight = FontWeight.Bold,
                 fontSize = 24.sp,
@@ -85,7 +85,7 @@ fun Login(viewModel: MainViewModel, actions: MainActions) {
             )
 
             Text(
-                text = "Đăng nhập để tiếp tục",
+                text = "Sign In to continue",
                 modifier = Modifier.align(Alignment.Start),
                 fontWeight = FontWeight.Bold,
                 fontSize = 24.sp,
@@ -97,7 +97,7 @@ fun Login(viewModel: MainViewModel, actions: MainActions) {
             OutlinedTextField(
                 value = emailState.value,
                 onValueChange = { emailState.value = it },
-                label = { Text(text = "Email") },
+                label = { Text(text = "Type your Email") },
                 modifier = Modifier.fillMaxWidth(),
                 textStyle = TextStyle(
                     color = Color.Black,
@@ -120,7 +120,7 @@ fun Login(viewModel: MainViewModel, actions: MainActions) {
             OutlinedTextField(
                 value = passwordState.value,
                 onValueChange = { passwordState.value = it },
-                label = { Text(text = "Mật khẩu") },
+                label = { Text(text = "Type Your Password") },
                 modifier = Modifier.fillMaxWidth(),
                 textStyle = TextStyle(
                     color = Color.Black,
@@ -154,7 +154,7 @@ fun Login(viewModel: MainViewModel, actions: MainActions) {
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text(text = "Đăng Nhập", fontWeight = FontWeight.Bold)
+                Text(text = "SIGN IN", fontWeight = FontWeight.Bold)
             }
 
             Spacer(modifier = Modifier.height(20.dp))

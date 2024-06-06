@@ -12,8 +12,8 @@ import com.example.heybooks.navigation.MainActions
 
 @Composable
 fun ClickTextLogin(actions: MainActions) {
-    val textOne = "Bạn đã có tài khoản ? "
-    val textTwo = "Đăng nhập"
+    val textOne = "Already Registered ? "
+    val textTwo = "Sign In"
     val textString = buildAnnotatedString {
         append(textOne)
         withStyle(style = SpanStyle(color = Color.Black)) {
@@ -23,14 +23,13 @@ fun ClickTextLogin(actions: MainActions) {
     }
     ClickableText(text = textString, onClick = {
         actions.gotoLogin()
-//        openSignup()
     })
 }
 
 @Composable
 fun ClickTextSignUp(actions: MainActions) {
-    val textOne = "Bạn chưa có tài khoản ? "
-    val textTwo = "Đăng ký"
+    val textOne = "Not Registered Yet ? "
+    val textTwo = "Sign Up"
     val textString = buildAnnotatedString {
         append(textOne)
         withStyle(style = SpanStyle(color = Color.Black)) {
@@ -40,6 +39,5 @@ fun ClickTextSignUp(actions: MainActions) {
     }
     ClickableText(text = textString, onClick = {
         actions.gotoSignUp()
-//        openSignup()
     })
 }
